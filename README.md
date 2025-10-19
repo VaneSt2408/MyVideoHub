@@ -40,7 +40,7 @@ MyVideoHub/
 
 1. Clona el repositorio:
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/VaneSt2408/MyVideoHub.git
 cd MyVideoHub
 ```
 
@@ -98,7 +98,7 @@ Este proyecto está bajo la Licencia ISC.
 
 ## 👨‍💻 Autor
 
-Tu nombre aquí
+VaneSt2408
 
 ---
 
