@@ -1,5 +1,9 @@
 import { Request, Response, RequestHandler } from 'express'; //importamos express para manejar las peticiones y respuestas
 import User from '../../model/userSchema'; //importamos el modelo de usuario
+import { sendResponse } from '../../utils/sendResponse';
+import crypto from 'crypto'; //importamos crypto para encriptar la contraseña
+import { hashPassword } from '../../utils/passwordHelper'; //importamos la función para encriptar la contraseña
+
 
 interface RegisterReq extends Request { //interface para la petición de registro
     body: { //body de la petición
@@ -8,17 +12,24 @@ interface RegisterReq extends Request { //interface para la petición de registr
     } //body de la petición
 } //interface para la petición de registro
 
-export const signUpUser : RequestHandler = async (req, res) => { //función para registrar un usuario
+export const signUpUser : RequestHandler = async (req: RegisterReq, res) => { //función para registrar un usuario
     try {
         const { email, password } = req.body; //desestructuramos el body de la petición
         const existingUser = await User.findOne({ email }); //buscamos un usuario con el email
         if (existingUser) { //si el usuario existe
-            //usuario ya existe
+            return sendResponse(res, 400, false, 'El usuario ya existe'); //devolvemos un error
         }
-        const newUser = await User.create({ email, password }); //creamos un nuevo usuario
+        const hashedPassword = await hashPassword(password);
+        await User.create({ 
+            email, 
+            password: hashPassword, 
+            token: crypto.randomBytes(16).toString("hex") 
+        }); //creamos un nuevo usuario
         //usuario creado
+        return sendResponse(res, 200, true, 'Usuario creado exitosamente'); //devolvemos el id del usuario creado
     } catch (error) {
         console.error('Error al crear el usuario:', error); //imprimimos el error en la consola
         //error al crear el usuario
+        return sendResponse(res, 500, false, 'Error del servidor'); //devolvemos un error del servidor
     }
 };
